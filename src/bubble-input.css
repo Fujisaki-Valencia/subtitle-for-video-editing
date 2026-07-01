@@ -1,0 +1,113 @@
+.bubble-container {
+  position: relative;
+}
+
+.input-line {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: max-content;
+  max-width: 480px;
+}
+
+.input-line.fading-line {
+  transition: opacity 400ms ease;
+}
+
+.bubble-content {
+  background-color: var(--background-color);
+  font-family: ui-monospace, 'JetBrains Mono', 'Fira Code', SFMono-Regular,
+    Menlo, Consolas, 'Liberation Mono', monospace;
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: inline-flex;
+  align-items: center;
+  max-width: 480px;
+  position: relative;
+  overflow-wrap: break-word;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  line-height: 1.4;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.prompt {
+  opacity: 0.55;
+  margin-right: 0.5em;
+}
+
+.rendered-text {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.char {
+  display: inline-block;
+  animation: char-fade-in 150ms ease-out both;
+}
+
+.char.char-static {
+  animation: none;
+}
+
+@keyframes char-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hidden-input {
+  position: fixed;
+  top: 0;
+  right: 0;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  outline: none;
+  background: none;
+  pointer-events: none;
+}
+
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  margin-left: 2px;
+  background-color: #e2b714;
+  border-radius: 1px;
+  animation: cursor-pop 150ms ease-out;
+}
+
+.cursor.cursor-idle {
+  animation: cursor-fade 1.6s ease-in-out infinite;
+}
+
+@keyframes cursor-fade {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.15;
+  }
+}
+
+@keyframes cursor-pop {
+  0% {
+    opacity: 0.4;
+    transform: scaleY(0.6);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
