@@ -1,5 +1,7 @@
 import {
   ChangeEventHandler,
+  CompositionEventHandler,
+  Fragment,
   KeyboardEventHandler,
   useCallback,
   useEffect,
@@ -8,59 +10,63 @@ import {
 } from 'react'
 import './bubble-input.css'
 
-const IDLE_DELAY = 500
-
 interface BubbleInputProps {
   value: string
+  history: string
   onChange: (value: string) => void
   onSubmit: () => void
-  hasText: boolean
-  fadingText: string | null
-  isFadingOut: boolean
-  fillColour: string
+  onClear: () => void
+  onBackspaceMerge: () => void
   strokeColour: string
 }
 
-const renderChars = (text: string, animate: boolean) =>
+const renderChars = (text: string, composing = false, keyPrefix = '') =>
   text.split('').map((char, index) => (
-    <span key={index} className={`char${animate ? '' : ' char-static'}`}>
+    <span
+      key={`${keyPrefix}${index}`}
+      className={`char${composing ? ' char-composing' : ''}`}
+    >
       {char}
     </span>
   ))
 
 const BubbleInput = ({
   value,
+  history,
   onChange,
   onSubmit,
-  hasText,
-  fadingText,
-  isFadingOut,
-  fillColour,
+  onClear,
+  onBackspaceMerge,
   strokeColour
 }: BubbleInputProps) => {
-  const refInput = useRef<HTMLInputElement>(null)
-  const [pulseKey, setPulseKey] = useState(0)
-  const [isIdle, setIsIdle] = useState(true)
-  const idleTimer = useRef<ReturnType<typeof setTimeout>>()
+  const refInput = useRef<HTMLTextAreaElement>(null)
+  const [compositionLength, setCompositionLength] = useState(0)
 
-  const handleTypingActivity = useCallback(() => {
-    setIsIdle(false)
-    setPulseKey(key => key + 1)
-    clearTimeout(idleTimer.current)
-    idleTimer.current = setTimeout(() => setIsIdle(true), IDLE_DELAY)
-  }, [])
-
-  useEffect(() => () => clearTimeout(idleTimer.current), [])
-
-  const handleChange: ChangeEventHandler<HTMLInputElement> = e => {
+  const handleChange: ChangeEventHandler<HTMLTextAreaElement> = e => {
     onChange(e.target.value)
-    handleTypingActivity()
   }
 
-  const handleKeyDown: KeyboardEventHandler = e => {
+  const handleCompositionUpdate: CompositionEventHandler<
+    HTMLTextAreaElement
+  > = e => {
+    setCompositionLength(e.data.length)
+  }
+
+  const handleCompositionEnd = () => {
+    setCompositionLength(0)
+  }
+
+  const handleKeyDown: KeyboardEventHandler<HTMLTextAreaElement> = e => {
     if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+      if (e.shiftKey) return
       e.preventDefault()
       onSubmit()
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      onClear()
+    } else if (e.key === 'Backspace' && value.length === 0) {
+      e.preventDefault()
+      onBackspaceMerge()
     }
   }
 
@@ -72,50 +78,52 @@ const BubbleInput = ({
 
   const focusInput = () => refInput.current?.focus()
 
+  const historyLines = history.length > 0 ? history.split('\n') : []
+  const hasText = history.length > 0 || value.length > 0
+
+  const committedValue =
+    compositionLength > 0 ? value.slice(0, -compositionLength) : value
+  const composingValue =
+    compositionLength > 0 ? value.slice(-compositionLength) : ''
+  const committedLines = committedValue.split('\n')
+
   return (
     <div className="bubble-container">
-      <div className="input-line" style={{ opacity: hasText ? 1 : 0 }}>
-        <div
-          className="bubble-content"
-          style={{ backgroundColor: fillColour, color: strokeColour }}
-          onClick={focusInput}
-        >
-          <span className="prompt">&gt; </span>
-          <span className="rendered-text">{renderChars(value, true)}</span>
-          <span
-            key={pulseKey}
-            className={`cursor${isIdle ? ' cursor-idle' : ''}`}
-          />
-          <input
-            ref={refInput}
-            className="hidden-input"
-            value={value}
-            autoComplete="off"
-            spellCheck={false}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            onBlur={handleBlur}
-          />
-        </div>
+      <div
+        className="manuscript"
+        style={{ color: strokeColour, opacity: hasText ? 1 : 0 }}
+        onClick={focusInput}
+      >
+        {historyLines.map((line, index) => (
+          <Fragment key={index}>
+            {index > 0 && <br />}
+            {renderChars(line)}
+          </Fragment>
+        ))}
+        {historyLines.length > 0 && <br />}
+        <span className="rendered-text">
+          {committedLines.map((line, index) => (
+            <Fragment key={`c${index}`}>
+              {index > 0 && <br />}
+              {renderChars(line, false, `c${index}-`)}
+            </Fragment>
+          ))}
+          {renderChars(composingValue, true, 'p')}
+        </span>
+        <span className="cursor" />
+        <textarea
+          ref={refInput}
+          className="hidden-input"
+          value={value}
+          autoComplete="off"
+          spellCheck={false}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          onCompositionUpdate={handleCompositionUpdate}
+          onCompositionEnd={handleCompositionEnd}
+          onBlur={handleBlur}
+        />
       </div>
-
-      {fadingText !== null && (
-        <div
-          className="input-line fading-line"
-          style={{ opacity: isFadingOut ? 0 : 1 }}
-        >
-          <div
-            className="bubble-content"
-            style={{ backgroundColor: fillColour, color: strokeColour }}
-          >
-            <span className="prompt">&gt; </span>
-            <span className="rendered-text">
-              {renderChars(fadingText, false)}
-            </span>
-            <span className="cursor cursor-idle" />
-          </div>
-        </div>
-      )}
     </div>
   )
 }
