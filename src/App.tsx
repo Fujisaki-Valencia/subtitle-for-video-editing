@@ -8,7 +8,7 @@ const BUBBLE_TIMEOUT = 200
 
 function App() {
   const [newMessage, setNewMessage] = useState('')
-  const fillColour = '#1e1e1e'
+  const fillColour = '#000000'
   const strokeColour = '#d1d0c5'
   const [fadingMessage, setFadingMessage] = useState<string | null>(null)
   const [isFadingOut, setIsFadingOut] = useState(false)

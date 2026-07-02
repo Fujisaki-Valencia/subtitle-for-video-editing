@@ -7,7 +7,7 @@
   left: 0;
   bottom: 0;
   width: max-content;
-  max-width: 480px;
+  max-width: 1000px;
 }
 
 .input-line.fading-line {
@@ -22,7 +22,7 @@
   padding: 6px 10px;
   display: inline-flex;
   align-items: center;
-  max-width: 480px;
+  max-width: 1000px;
   position: relative;
   overflow-wrap: break-word;
   border: none;
