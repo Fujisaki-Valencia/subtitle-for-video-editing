@@ -18,8 +18,8 @@
   background-color: var(--background-color);
   font-family: ui-monospace, 'JetBrains Mono', 'Fira Code', SFMono-Regular,
     Menlo, Consolas, 'Liberation Mono', monospace;
-  border-radius: 6px;
-  padding: 6px 10px;
+  border-radius: 7px;
+  padding: 8px 13px;
   display: inline-flex;
   align-items: center;
   max-width: 1000px;
@@ -27,7 +27,7 @@
   overflow-wrap: break-word;
   border: none;
   outline: none;
-  font-size: 15px;
+  font-size: 19px;
   line-height: 1.4;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
@@ -79,7 +79,7 @@
 
 .cursor {
   display: inline-block;
-  width: 2px;
+  width: 3px;
   height: 1.1em;
   margin-left: 2px;
   background-color: #e2b714;
