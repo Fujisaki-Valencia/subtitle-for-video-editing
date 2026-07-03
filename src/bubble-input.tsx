@@ -18,6 +18,7 @@ interface BubbleInputProps {
   onClear: () => void
   onBackspaceMerge: () => void
   strokeColour: string
+  cursorColour: string
 }
 
 const renderChars = (text: string, composing = false, keyPrefix = '') =>
@@ -37,7 +38,8 @@ const BubbleInput = ({
   onSubmit,
   onClear,
   onBackspaceMerge,
-  strokeColour
+  strokeColour,
+  cursorColour
 }: BubbleInputProps) => {
   const refInput = useRef<HTMLTextAreaElement>(null)
   const [compositionLength, setCompositionLength] = useState(0)
@@ -110,7 +112,10 @@ const BubbleInput = ({
           ))}
           {renderChars(composingValue, true, 'p')}
         </span>
-        <span className="cursor" />
+        <span
+          className="cursor"
+          style={{ backgroundColor: cursorColour }}
+        />
         <textarea
           ref={refInput}
           className="hidden-input"
