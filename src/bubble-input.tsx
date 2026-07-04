@@ -43,9 +43,11 @@ const BubbleInput = ({
 }: BubbleInputProps) => {
   const refInput = useRef<HTMLTextAreaElement>(null)
   const [compositionLength, setCompositionLength] = useState(0)
+  const [cursorHidden, setCursorHidden] = useState(false)
 
   const handleChange: ChangeEventHandler<HTMLTextAreaElement> = e => {
     onChange(e.target.value)
+    setCursorHidden(false)
   }
 
   const handleCompositionUpdate: CompositionEventHandler<
@@ -65,7 +67,12 @@ const BubbleInput = ({
       onSubmit()
     } else if (e.key === 'Escape') {
       e.preventDefault()
-      onClear()
+      if (cursorHidden) {
+        onClear()
+        setCursorHidden(false)
+      } else {
+        setCursorHidden(true)
+      }
     } else if (e.key === 'Backspace' && value.length === 0) {
       e.preventDefault()
       onBackspaceMerge()
@@ -112,10 +119,9 @@ const BubbleInput = ({
           ))}
           {renderChars(composingValue, true, 'p')}
         </span>
-        <span
-          className="cursor"
-          style={{ backgroundColor: cursorColour }}
-        />
+        {!cursorHidden && (
+          <span className="cursor" style={{ backgroundColor: cursorColour }} />
+        )}
         <textarea
           ref={refInput}
           className="hidden-input"
