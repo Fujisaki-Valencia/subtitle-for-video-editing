@@ -19,6 +19,7 @@ interface BubbleInputProps {
   onBackspaceMerge: () => void
   strokeColour: string
   cursorColour: string
+  fontSize: number
 }
 
 const renderChars = (text: string, composing = false, keyPrefix = '') =>
@@ -39,7 +40,8 @@ const BubbleInput = ({
   onClear,
   onBackspaceMerge,
   strokeColour,
-  cursorColour
+  cursorColour,
+  fontSize
 }: BubbleInputProps) => {
   const refInput = useRef<HTMLTextAreaElement>(null)
   const [compositionLength, setCompositionLength] = useState(0)
@@ -100,7 +102,7 @@ const BubbleInput = ({
     <div className="bubble-container">
       <div
         className="manuscript"
-        style={{ color: strokeColour, opacity: hasText ? 1 : 0 }}
+        style={{ color: strokeColour, opacity: hasText ? 1 : 0, fontSize }}
         onClick={focusInput}
       >
         {historyLines.map((line, index) => (
